@@ -1,2 +1,2 @@
 # CardGame
-Russian card game "Fool"
+Русская карточная игра "Дурак". GUI отсутствует. 
