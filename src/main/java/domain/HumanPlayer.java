@@ -1,18 +1,18 @@
 package domain;
 
-import service.PlayerManager;
 import service.PlayerService;
 
 import java.util.InputMismatchException;
+import java.util.Queue;
 import java.util.Scanner;
 
 
 public class HumanPlayer extends AbstractPlayer {
 
-    Scanner scanner = new Scanner(System.in);
+    private Scanner scanner = new Scanner(System.in);
 
-    public HumanPlayer(PlayerManager playerManager, PlayerService playerService) {
-        super(playerManager, playerService);
+    public HumanPlayer(Queue<Card> cardDeck, PlayerService playerService) {
+        super(cardDeck, playerService);
     }
 
     @Override
@@ -39,14 +39,14 @@ public class HumanPlayer extends AbstractPlayer {
         }
 
         fillHand();
-        if (cardForMove != null && placedCard != null) {
+        if (placedCard != null) {
             setSuccessfullyDefended(true);
             return null;
         }
         return cardForMove;
     }
 
-    public Card askHumanPlayerToChooseCard(Card placedCard) {
+    private Card askHumanPlayerToChooseCard(Card placedCard) {
         Card chosenCard;
         System.out.println(placedCard != null ? "Choose the card to beat placed card: " + placedCard.toString()
                 : "Choose the card from your hand: ");

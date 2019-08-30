@@ -1,7 +1,6 @@
 package domain;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public interface Player {
 
@@ -14,5 +13,7 @@ public interface Player {
     List<Card> getHand();
 
     void showHand();
+
+    String getName();
 
 }

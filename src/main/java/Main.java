@@ -1,8 +1,12 @@
+import domain.AbstractPlayer;
+import domain.Card;
+import domain.Player;
+import service.DeckService;
+import service.PlayerCreator;
 import service.PlayerManager;
+import service.PlayerService;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 /*
     In this small project I used Java core technologies and OOP concepts like encapsulation, abstraction, inheritance,
@@ -12,44 +16,22 @@ import java.util.Scanner;
 public class Main {
     public static void main(String[] args) {
 
-        int humanPlayers = 0;
-        int aiPlayers = 0;
-        List <String> names = new ArrayList<>();
-
-        Scanner scanner = new Scanner(System.in);
-
         System.out.println("Greetings!");
         System.out.println("Today you gonna challenge against the computer in this awesome card game");
         System.out.println("Total number of players must be 2-6");
 
-        do {
-            System.out.println("Please enter the number of human players (0-6):");
-            try {
-                humanPlayers = Integer.parseInt(scanner.nextLine());
-            } catch (NumberFormatException ex) {
-                System.out.println("Cannot read the number");
-            }
-        } while (humanPlayers < 0 || humanPlayers > 6);
+        Queue<Card> cardDeck = new DeckService().createNewDeck();
+        PlayerService playerService = new PlayerService(cardDeck.peek());
+        PlayerCreator playerCreator = new PlayerCreator(cardDeck, playerService);
 
-        if(humanPlayers != 0) {
-            for (int i = 0; i < humanPlayers; i++) {
-                System.out.println("Please enter the name of " + ++i + " human player:");
-                names.add(scanner.nextLine());
-            }
+        List<Player> players = playerCreator.createPlayers();
+
+        if (players.size() < 2 || players.size() > 6) {
+            System.out.println("Error. Number of players must be 2 to 6");
+            System.exit(0);
         }
 
-        do {
-            System.out.println("Please enter the number of AI players (0-6):");
-            try {
-                aiPlayers = Integer.parseInt(scanner.nextLine());
-            } catch (NumberFormatException ex) {
-                System.out.println("Cannot read the number");
-            }
-        } while (aiPlayers < 0 || aiPlayers > (6-humanPlayers));
-
-        if (humanPlayers + aiPlayers < 2 || humanPlayers + aiPlayers > 6)
-            System.exit(0);
-        PlayerManager manager = new PlayerManager(humanPlayers, aiPlayers, names);
+        PlayerManager manager = new PlayerManager(players, cardDeck);
         manager.play();
 
     }

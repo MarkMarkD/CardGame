@@ -1,13 +1,14 @@
 package domain;
 
-import service.PlayerManager;
 import service.PlayerService;
+
+import java.util.Queue;
 
 
 public class AiPlayer extends AbstractPlayer {
 
-    public AiPlayer(PlayerManager playerManager, PlayerService playerService) {
-        super(playerManager, playerService);
+    public AiPlayer(Queue<Card> cardDeck, PlayerService playerService) {
+        super(cardDeck, playerService);
     }
 
     @Override
@@ -24,7 +25,7 @@ public class AiPlayer extends AbstractPlayer {
             return null;
         }
         fillHand();
-        if (cardForMove != null && placedCard != null) {
+        if (placedCard != null) {
             setSuccessfullyDefended(true);
             return null;
         }
