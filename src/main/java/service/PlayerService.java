@@ -14,7 +14,6 @@ public class PlayerService {
     }
 
     public Card getCardForMove(Card placedCard, List<Card> hand) {
-
          if (placedCard == null) {
              return chooseTheSmallestCardFromHand(hand);
          }
@@ -30,7 +29,7 @@ public class PlayerService {
         List<Card> cardsThatCanBeatPlacedCard = hand
                 .stream()
                 .filter(card -> card.getSuit().equals(placedCard.getSuit()))
-                .filter(card -> card.getNum() > placedCard.getNum())
+                .filter(card -> card.getRank() > placedCard.getRank())
                 .collect(Collectors.toList());
 
         if (cardsThatCanBeatPlacedCard.size() > 0 & !cardsThatCanBeatPlacedCard.isEmpty()) {
@@ -70,7 +69,7 @@ public class PlayerService {
         else {
             Card minCard = getMinCardFromList(trumpCards);
             hand.remove(minCard);
-            return (minCard);
+            return (minCard); 
         }
     }
 
@@ -78,9 +77,9 @@ public class PlayerService {
     private Card getMinCardFromList(List<Card> cards) {
         Card minCard = cards.get(0);
         if (cards.size() > 1) {
-            for (int i = 0; i < cards.size(); i++) {
-                if (cards.get(i).getNum() < minCard.getNum()) {
-                    minCard = cards.get(i);
+            for (Card card : cards) {
+                if (card.getRank() < minCard.getRank()) {
+                    minCard = card;
                 }
             }
         }
@@ -91,7 +90,7 @@ public class PlayerService {
     public boolean isCardBeatsCard(Card cardForMove, Card placedCard) {
         boolean isNumberChecked= false;
         boolean isSuitChecked = false;
-        if (cardForMove.getNum() > placedCard.getNum()) {
+        if (cardForMove.getRank() > placedCard.getRank()) {
             isNumberChecked = true;
         }
         if ((cardForMove.getSuit().equals(trump.getSuit())) && !(placedCard.getSuit().equals(trump.getSuit()))) {
@@ -101,12 +100,7 @@ public class PlayerService {
         if (cardForMove.getSuit().equals(placedCard.getSuit())) {
             isSuitChecked = true;
         }
-        if ((isNumberChecked) && (isSuitChecked)) {
-            return true;
-        }
-        else {
-            return false;
-        }
+        return (isNumberChecked) && (isSuitChecked);
     }
 
     public Card getTrump() {

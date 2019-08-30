@@ -1,33 +1,31 @@
 package domain;
 
-import service.PlayerManager;
 import service.PlayerService;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Queue;
 
 public abstract class AbstractPlayer implements Player {
 
-    protected PlayerManager manager;
+    private final Queue<Card> cardDeck;
     protected PlayerService playerService;
     protected String name;                              // player's name
     protected List<Card> hand = new ArrayList<>();      // cards in player's hand
     protected boolean isSuccessfullyDefended;           // flag to define if player was defending or attacking
     private int i;                                      // counter for showing hand
 
-    public AbstractPlayer (PlayerManager playerManager, PlayerService playerService) {
-        this.manager = playerManager;
+    public AbstractPlayer(Queue<Card> cardDeck, PlayerService playerService) {
+        this.cardDeck = cardDeck;
         this.playerService = playerService;
     }
-
 
     @Override
     public void fillHand() {
         while(hand.size() < 6) {
-            Card cardFromDeck = manager.getCardFromDeck();
-            if (cardFromDeck == null)
-                break;
-            hand.add(cardFromDeck);
+            if (cardDeck.isEmpty())
+                return;
+            hand.add(cardDeck.poll());
         }
     }
 
@@ -35,7 +33,6 @@ public abstract class AbstractPlayer implements Player {
     public void takeCard(Card placedCard) {
         System.out.println("taking the card " + placedCard);
         hand.add(placedCard);
-        placedCard = null;
     }
 
     @Override
@@ -49,6 +46,7 @@ public abstract class AbstractPlayer implements Player {
         return hand;
     }
 
+    @Override
     public String getName() {
         return name;
     }
@@ -69,4 +67,6 @@ public abstract class AbstractPlayer implements Player {
     public void setSuccessfullyDefended(boolean successfullyDefended) {
         isSuccessfullyDefended = successfullyDefended;
     }
+
+
 }
