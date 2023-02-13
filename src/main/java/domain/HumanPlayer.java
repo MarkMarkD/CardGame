@@ -1,69 +1,88 @@
 package domain;
 
-import service.PlayerService;
+import exception.CardValidationException;
+import service.DeckHolder;
+import service.io.UserInterface;
+import validator.DefendCardValidator;
 
 import java.util.InputMismatchException;
-import java.util.Queue;
-import java.util.Scanner;
+import java.util.Optional;
 
 
 public class HumanPlayer extends AbstractPlayer {
 
-    private Scanner scanner = new Scanner(System.in);
+    private final DefendCardValidator cardValidator;
 
-    public HumanPlayer(Queue<Card> cardDeck, PlayerService playerService) {
-        super(cardDeck, playerService);
+    public HumanPlayer(String name, DeckHolder deckHolder, DefendCardValidator defendCardValidator, UserInterface ui) {
+        super(name, deckHolder, ui);
+        this.cardValidator = defendCardValidator;
     }
 
     @Override
-    public Card move(Card placedCard) {
-        System.out.println("trump : " + playerService.getTrump().getSuit());
-        System.out.println("placedCard = " + (placedCard == null ? "no card" : placedCard.toString()));
-
-        // choose the card for move (or to beat placed card)
-        Card cardForMove = askHumanPlayerToChooseCard(placedCard);
-        if (placedCard != null && cardForMove != null) {
-            while (!playerService.isCardBeatsCard(cardForMove, placedCard)) {
-                System.out.println("This card can't beat placed card: " + placedCard.toString());
-                System.out.println("Please choose another one or type \"take\" to take the card: ");
-                cardForMove = askHumanPlayerToChooseCard(placedCard);
-            }
-        }
-        System.out.println("card for move = " + (cardForMove == null ? "no card" : cardForMove.toString()));
-
-        // card for move hasn't been chosen, take placed card
-        if (cardForMove == null) {
-            takeCard(placedCard);
-            setSuccessfullyDefended(false);
-            return null;
-        }
-
-        fillHand();
-        if (placedCard != null) {
-            setSuccessfullyDefended(true);
-            return null;
-        }
-        return cardForMove;
+    public Result attack() {
+        Card cardForMove = askHumanPlayerToChooseCard();
+        cardsInHand.remove(cardForMove);
+        return new Result(ResultType.ATTACKED, cardForMove);
     }
 
-    private Card askHumanPlayerToChooseCard(Card placedCard) {
+    @Override
+    public Result defend(Card placedCard) {
+        Optional<Card> defendCard;
+        while (true) {
+            defendCard = askHumanPlayerToChooseCard(placedCard);
+            if (defendCard.isEmpty()) {
+                cardsInHand.add(placedCard);
+                return new Result(ResultType.TOOK_PLACED_CARD);
+            }
+            try {
+                cardValidator.validate(defendCard.get(), placedCard);
+            } catch (CardValidationException ex) {
+                getUserInterface().out(ex.getMessage());
+                getUserInterface().out("Please choose another card or type \"take\" to take the card: ");
+                continue;
+            }
+            cardsInHand.remove(defendCard.get());
+            return new Result(ResultType.DEFENDED, defendCard.get());
+        }
+    }
+
+    private Card askHumanPlayerToChooseCard() {
         Card chosenCard;
-        System.out.println(placedCard != null ? "Choose the card to beat placed card: " + placedCard.toString()
-                : "Choose the card from your hand: ");
+        String message = "Choose the card from your hand: ";
+        getUserInterface().out(message);
         showHand();
 
         while (true) {
-            String result = scanner.nextLine();
-            if (result.equalsIgnoreCase("take"))
-                return null;
+            String result = getUserInterface().in();
             try {
-                chosenCard = hand.get((Integer.parseInt(result)-1));
+                chosenCard = cardsInHand.get((Integer.parseInt(result)-1));
             } catch (IndexOutOfBoundsException | InputMismatchException ex) {
-                System.out.println("Please enter the row number of card in your hand");
+                getUserInterface().out("Please enter the row number of card in your hand");
                 continue;
             }
             return chosenCard;
         }
     }
 
+    private Optional<Card> askHumanPlayerToChooseCard(Card placedCard) {
+        Card chosenCard;
+        String message = "Choose the card from your hand to beat placed card or type \"take\" to take the card: "
+                + placedCard.toString();
+        getUserInterface().out(message);
+        showHand();
+
+        while (true) {
+            String result = getUserInterface().in();
+            if (result.equalsIgnoreCase("take")) {
+                return Optional.empty();
+            }
+            try {
+                chosenCard = cardsInHand.get((Integer.parseInt(result)-1));
+            } catch (IndexOutOfBoundsException | InputMismatchException ex) {
+                getUserInterface().out("Please enter the row number of card in your hand");
+                continue;
+            }
+            return Optional.of(chosenCard);
+        }
+    }
 }

@@ -1,49 +1,51 @@
 package domain;
 
-import service.PlayerService;
+import service.DeckHolder;
+import service.io.UserInterface;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Queue;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public abstract class AbstractPlayer implements Player {
 
-    private final Queue<Card> cardDeck;
-    protected PlayerService playerService;
-    protected String name;                              // player's name
-    protected List<Card> hand = new ArrayList<>();      // cards in player's hand
-    protected boolean isSuccessfullyDefended;           // flag to define if player was defending or attacking
-    private int i;                                      // counter for showing hand
+    private final String name;
+    private final DeckHolder deckHolder;
+    private final UserInterface userInterface;
+    protected List<Card> cardsInHand = new ArrayList<>();
 
-    public AbstractPlayer(Queue<Card> cardDeck, PlayerService playerService) {
-        this.cardDeck = cardDeck;
-        this.playerService = playerService;
+    public AbstractPlayer(String name, DeckHolder deckHolder, UserInterface userInterface) {
+        this.name = name;
+        this.deckHolder = deckHolder;
+        this.userInterface = userInterface;
     }
 
     @Override
     public void fillHand() {
-        while(hand.size() < 6) {
-            if (cardDeck.isEmpty())
+        while(cardsInHand.size() < 6) {
+            if (deckHolder.isEmpty())
                 return;
-            hand.add(cardDeck.poll());
+            cardsInHand.add(deckHolder.getNextCardFromDeck());
         }
     }
 
     @Override
     public void takeCard(Card placedCard) {
-        System.out.println("taking the card " + placedCard);
-        hand.add(placedCard);
+        userInterface.out("taking the card " + placedCard);
+        cardsInHand.add(placedCard);
     }
 
     @Override
     public void showHand() {
-        i = 0;
-        hand.stream().map(card -> ++i + ": " + card.toString()).forEach(System.out::println);
+        AtomicInteger counter = new AtomicInteger();
+        cardsInHand.stream()
+                .map(card -> counter.incrementAndGet() + ": " + card.toString())
+                .forEach(System.out::println);
     }
 
     @Override
     public List<Card> getHand() {
-        return hand;
+        return cardsInHand;
     }
 
     @Override
@@ -51,22 +53,11 @@ public abstract class AbstractPlayer implements Player {
         return name;
     }
 
-    public AbstractPlayer name(String name) {
-        this.name = name;
-        return this;
+    public DeckHolder getDeckHolder() {
+        return deckHolder;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public UserInterface getUserInterface() {
+        return userInterface;
     }
-
-    public boolean isSuccessfullyDefended() {
-        return isSuccessfullyDefended;
-    }
-
-    public void setSuccessfullyDefended(boolean successfullyDefended) {
-        isSuccessfullyDefended = successfullyDefended;
-    }
-
-
 }

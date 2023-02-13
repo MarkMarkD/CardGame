@@ -1,6 +1,8 @@
 package service;
 
 import domain.*;
+import domain.PlayerType;
+import util.RandomNameGenerator;
 
 import java.util.*;
 
@@ -9,16 +11,18 @@ import java.util.*;
  * Injects a reference to a card deck to every Player class so that player can interact with the card deck during the game
  */
 
-public class PlayerCreator {
+public class PlayerCreatorOld {
 
-    private int numHumanPlayers;
-    private int numAiPlayers;
-    private final Queue<Card> cardDeck;
-    private final PlayerService playerService;
+    private final int humanPlayers;
+    private final int aiPlayers;
+    private final RandomNameGenerator nameGenerator;
 
-    public PlayerCreator(Queue<Card> cardDeck, PlayerService playerService) {
-        this.cardDeck = cardDeck;
-        this.playerService = playerService;
+    public PlayerCreatorOld() {
+        this.nameGenerator = new RandomNameGenerator();
+    }
+
+    Player create(PlayerType type) {
+
     }
 
     public List<Player> createPlayers() {
@@ -49,10 +53,7 @@ public class PlayerCreator {
         return humanPlayers;
     }
 
-    private String getRandomName() {
-        List<String> randomNames = Arrays.asList("Bob", "Pibody", "Serafim", "Bartolomew", "Leopold");
-        return randomNames.get(new Random().nextInt(5));
-    }
+
 
     private List<AbstractPlayer> createHumanPlayers() {
         List<AbstractPlayer> aiPlayers = new ArrayList<>();

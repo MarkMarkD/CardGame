@@ -1,18 +1,18 @@
 package service;
 
 import domain.*;
+import service.io.UserInterface;
 
 import java.util.*;
 
 public class PlayerManager {
 
     private final List<Player> players;
-    private final Queue<Card> deck;
+    private final UserInterface userInterface;
 
-    public PlayerManager(List<Player> players,
-                         Queue<Card> deck) {
+    public PlayerManager(List<Player> players, UserInterface userInterface) {
         this.players = players;
-        this.deck = deck;
+        this.userInterface = userInterface;
     }
 
     public void play() {
@@ -21,50 +21,53 @@ public class PlayerManager {
         showGameResults();
     }
 
-    // start the game
     private void startGame() {
-        Card placedCard = null;
-        Iterator iterator = players.iterator();
-        Player player;
+//        Optional<Card> actionCard = Optional.empty();
+        Result result = null;
+        Iterator<Player> iterator = players.iterator();
+        Player currentPlayer;
         while(players.size() >= 1) {
-            if(iterator.hasNext()) {
-                player = (Player) iterator.next();
-                System.out.println();
-                System.out.println("player " + (player).getName() + " makes a move: ");
-                placedCard = player.move(placedCard);
-
-                if (((AbstractPlayer) player).isSuccessfullyDefended()){
-                    placedCard = null;
-                    if (player.getHand().size() > 0) {
-                        ((AbstractPlayer) player).setSuccessfullyDefended(false);
-                        placedCard = player.move(placedCard);
+            if(!iterator.hasNext()) {
+                iterator = players.iterator();
+            }
+            currentPlayer = iterator.next();
+            userInterface.out("");
+            userInterface.out("Player " + currentPlayer.getName() + " makes a move: ");
+            // first turn in game
+            if (result == null) {
+                result = currentPlayer.attack();
+                currentPlayer.fillHand();
+            }
+            else {
+                if(ResultType.ATTACKED.equals(result.getResultType())) {
+                    result = currentPlayer.defend(result.getActionCard());
+                    currentPlayer.fillHand();
+                    if (currentPlayer.getHand().isEmpty()) {
+                        iterator.remove();
+                        continue;
                     }
                 }
+                if(ResultType.DEFENDED.equals(result.getResultType())) {
+                    result = currentPlayer.attack();
+                    currentPlayer.fillHand();
+                    if (currentPlayer.getHand().isEmpty()) {
+                        iterator.remove();
+                        continue;
+                    }
+                }
+            }
 
-                if (player.getHand().size() == 0)
-                    iterator.remove();
-                if (players.size() == 1 && placedCard == null)
-                    break;
-            } else
-                iterator = players.iterator();
+            if (players.size() == 1 && (result.getResultType().equals(ResultType.DEFENDED)
+                    || (result.getResultType().equals(ResultType.TOOK_PLACED_CARD)))) {
+                break;
+            }
         }
     }
 
     private void showGameResults() {
-        System.out.println();
-        System.out.println("Game results: ");
-        System.out.println(players.size() == 1 ? players.get(0).getName() + " lost the game" : "Dead heat");
-        System.out.println(deck.size());
-    }
-
-    public Card getCardFromDeck() {
-        Card cardFromDeck = null;
-        Iterator iterator = deck.iterator();
-        if (iterator.hasNext()) {
-            cardFromDeck = (Card) iterator.next();
-            iterator.remove();
-        }
-        return cardFromDeck;
+        userInterface.out("");
+        userInterface.out("Game results: ");
+        userInterface.out(players.size() == 1 ? players.get(0).getName() + " lost the game" : "Dead heat");
     }
 
 }

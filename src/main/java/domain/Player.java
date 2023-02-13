@@ -8,12 +8,13 @@ public interface Player {
 
     void takeCard(Card placedCard);
 
-    Card move(Card placedCard);
+    Result attack();
+
+    Result defend(Card actionCard);
 
     List<Card> getHand();
 
     void showHand();
 
     String getName();
-
 }

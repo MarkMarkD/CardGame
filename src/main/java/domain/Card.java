@@ -1,33 +1,33 @@
 package domain;
 
+import util.Rank;
 import util.Suit;
 
 import java.util.Objects;
 
 /**
- * A card. This is an immutable class and cannot be changed after creation.
+ * A card. This class is immutable and cannot be changed after creation.
  */
 
 public final class Card {
     private final Suit suit;
-    private final Integer rank;
+    private final Rank rank;
 
-    private final int hashCode;  // if class is immutable, we can store hashCode in a variable instead of calculating it each time
+    // if class is immutable, we can store hashCode in a variable instead of calculating it each time
+    private final int hashCode;
 
-    public Card(int rank, Suit suit) throws IllegalAccessException {
+    public Card(Rank rank, Suit suit) {
         this.suit = suit;
-        if (rank < 6 || rank > 14)
-            throw new IllegalAccessException("Value is out of range for a card rank");
         this.rank = rank;
         hashCode = Objects.hash(suit, rank);
     }
 
     public Suit getSuit() {
-        return Suit.valueOf(suit.name());
+        return suit;
     }
 
-    public Integer getRank() {
-        return new Integer(rank);
+    public Rank getRank() {
+        return rank;
     }
 
     @Override
@@ -36,7 +36,7 @@ public final class Card {
         if (o == null || getClass() != o.getClass()) return false;
         Card card = (Card) o;
         return suit == card.suit &&
-                Objects.equals(rank, card.rank);
+                rank == card.rank;
     }
 
     @Override
@@ -46,14 +46,6 @@ public final class Card {
 
     @Override
     public String toString() {
-        if (rank.equals(11))
-            return ("jack of " + suit);
-        else if (rank.equals(12))
-            return ("queen of " + suit);
-        else if (rank.equals(13))
-            return ("king of " + suit);
-        else if (rank.equals(14))
-            return ("ace of " + suit);
-        else return (rank + " of " + suit);
+        return (rank + " of " + suit);
     }
 }
