@@ -16,12 +16,8 @@ public class Main {
         UserInterface userInterface = new ConsoleUserInterface();
         printGreetings(userInterface);
         DeckHolder deckHolder = new DeckHolder();
-        List<Player> players = initPlayers(userInterface);
+        List<Player> players = new PlayerInitializer(userInterface).initPlayers();
         new PlayerManager(players, userInterface).play();
-    }
-
-    public static List<Player> initPlayers(UserInterface userInterface) {
-        return new PlayerInitializer(userInterface).initPlayers();
     }
 
     public static void printGreetings(UserInterface userInterface) {
