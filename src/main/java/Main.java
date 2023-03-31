@@ -1,8 +1,11 @@
-import service.*;
+import domain.Player;
+import service.DeckHolder;
+import service.PlayerManager;
 import service.io.ConsoleUserInterface;
 import service.io.UserInterface;
 import service.player.PlayerInitializer;
-import validator.PlayerNumberValidator;
+
+import java.util.List;
 
 /*
     Just a small card game. Have fun
@@ -13,10 +16,12 @@ public class Main {
         UserInterface userInterface = new ConsoleUserInterface();
         printGreetings(userInterface);
         DeckHolder deckHolder = new DeckHolder();
-        PlayerNumberValidator playerValidator = new PlayerNumberValidator();
-        PlayerInitializer playerInitializer = new PlayerInitializer(playerValidator, userInterface);
-        PlayerManager manager = new PlayerManager(playerInitializer.initPlayers(), userInterface);
-        manager.play();
+        List<Player> players = initPlayers(userInterface);
+        new PlayerManager(players, userInterface).play();
+    }
+
+    public static List<Player> initPlayers(UserInterface userInterface) {
+        return new PlayerInitializer(userInterface).initPlayers();
     }
 
     public static void printGreetings(UserInterface userInterface) {
