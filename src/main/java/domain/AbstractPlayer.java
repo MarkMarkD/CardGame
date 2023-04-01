@@ -1,6 +1,6 @@
 package domain;
 
-import service.DeckHolder;
+import service.CardDeck;
 import service.io.UserInterface;
 
 import java.util.ArrayList;
@@ -10,22 +10,22 @@ import java.util.concurrent.atomic.AtomicInteger;
 public abstract class AbstractPlayer implements Player {
 
     private final String name;
-    private final DeckHolder deckHolder;
+    private final CardDeck cardDeck;
     private final UserInterface userInterface;
     protected List<Card> cardsInHand = new ArrayList<>();
 
-    public AbstractPlayer(String name, DeckHolder deckHolder, UserInterface userInterface) {
+    public AbstractPlayer(String name, CardDeck cardDeck, UserInterface userInterface) {
         this.name = name;
-        this.deckHolder = deckHolder;
+        this.cardDeck = cardDeck;
         this.userInterface = userInterface;
     }
 
     @Override
     public void fillHand() {
         while(cardsInHand.size() < 6) {
-            if (deckHolder.isEmpty())
+            if (cardDeck.isEmpty())
                 return;
-            cardsInHand.add(deckHolder.getNextCardFromDeck());
+            cardsInHand.add(cardDeck.getNextCardFromDeck());
         }
     }
 
@@ -53,8 +53,8 @@ public abstract class AbstractPlayer implements Player {
         return name;
     }
 
-    public DeckHolder getDeckHolder() {
-        return deckHolder;
+    public CardDeck getDeckHolder() {
+        return cardDeck;
     }
 
     public UserInterface getUserInterface() {

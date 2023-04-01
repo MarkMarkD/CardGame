@@ -1,5 +1,5 @@
 import domain.Player;
-import service.DeckHolder;
+import service.CardDeck;
 import service.PlayerManager;
 import service.io.ConsoleUserInterface;
 import service.io.UserInterface;
@@ -15,8 +15,8 @@ public class Main {
     public static void main(String[] args) {
         UserInterface userInterface = new ConsoleUserInterface();
         printGreetings(userInterface);
-        DeckHolder deckHolder = new DeckHolder();
         List<Player> players = new PlayerInitializer(userInterface).initPlayers();
+        CardDeck cardDeck = new CardDeck();
         new PlayerManager(players, userInterface).play();
     }
 

@@ -6,14 +6,14 @@ import util.Suit;
 
 import java.util.*;
 
-public class DeckHolder {
+public class CardDeck {
 
-    private final Queue<Card> cardDeck;
+    private final Queue<Card> deck;
     private final Card trump;
 
-    public DeckHolder() {
-        this.cardDeck = createNewDeck();
-        this.trump = cardDeck.peek();
+    public CardDeck() {
+        this.deck = createNewDeck();
+        this.trump = deck.peek();
     }
 
     private Queue<Card> createNewDeck() {
@@ -28,7 +28,7 @@ public class DeckHolder {
     }
 
     public Card getNextCardFromDeck() {
-        return cardDeck.poll();
+        return deck.poll();
     }
 
     public Suit getTrumpSuit() {
@@ -36,6 +36,6 @@ public class DeckHolder {
     }
 
     public boolean isEmpty() {
-        return cardDeck.isEmpty();
+        return deck.isEmpty();
     }
 }

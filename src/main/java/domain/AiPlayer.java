@@ -1,6 +1,6 @@
 package domain;
 
-import service.DeckHolder;
+import service.CardDeck;
 import service.io.UserInterface;
 
 import java.util.List;
@@ -10,8 +10,8 @@ import java.util.stream.Collectors;
 
 public class AiPlayer extends AbstractPlayer {
 
-    public AiPlayer(String name, DeckHolder deckHolder, UserInterface ui) {
-        super(name, deckHolder, ui);
+    public AiPlayer(String name, CardDeck cardDeck, UserInterface ui) {
+        super(name, cardDeck, ui);
     }
 
     @Override

@@ -8,13 +8,9 @@ import util.UserBasedNameProvider;
 public class PlayerCreatorFactory {
 
     public static PlayerCreator getPlayerCreator(PlayerType type, UserInterface userInterface) {
-        switch (type) {
-            case AI:
-                return new AiPlayerCreator(new RandomNameGenerator());
-            case HUMAN:
-                return new HumanPlayerCreator(new UserBasedNameProvider(userInterface));
-            default:
-                throw new IllegalArgumentException("Player type is not supported.");
-        }
+        return switch (type) {
+            case AI -> new AiPlayerCreator(new RandomNameGenerator());
+            case HUMAN -> new HumanPlayerCreator(new UserBasedNameProvider(userInterface));
+        };
     }
 }

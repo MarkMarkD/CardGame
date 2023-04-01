@@ -1,7 +1,7 @@
 package domain;
 
 import exception.CardValidationException;
-import service.DeckHolder;
+import service.CardDeck;
 import service.io.UserInterface;
 import validator.DefendCardValidator;
 
@@ -13,8 +13,8 @@ public class HumanPlayer extends AbstractPlayer {
 
     private final DefendCardValidator cardValidator;
 
-    public HumanPlayer(String name, DeckHolder deckHolder, DefendCardValidator defendCardValidator, UserInterface ui) {
-        super(name, deckHolder, ui);
+    public HumanPlayer(String name, CardDeck cardDeck, DefendCardValidator defendCardValidator, UserInterface ui) {
+        super(name, cardDeck, ui);
         this.cardValidator = defendCardValidator;
     }
 
