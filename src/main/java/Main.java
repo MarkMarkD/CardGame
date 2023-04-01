@@ -15,8 +15,8 @@ public class Main {
     public static void main(String[] args) {
         UserInterface userInterface = new ConsoleUserInterface();
         printGreetings(userInterface);
-        List<Player> players = new PlayerInitializer(userInterface).initPlayers();
         CardDeck cardDeck = new CardDeck();
+        List<Player> players = new PlayerInitializer(userInterface, cardDeck).initPlayers();
         new PlayerManager(players, userInterface).play();
     }
 

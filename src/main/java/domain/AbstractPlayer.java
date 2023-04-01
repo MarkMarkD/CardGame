@@ -10,8 +10,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 public abstract class AbstractPlayer implements Player {
 
     private final String name;
-    private final CardDeck cardDeck;
-    private final UserInterface userInterface;
+    private CardDeck cardDeck;
+    private UserInterface userInterface;
     protected List<Card> cardsInHand = new ArrayList<>();
 
     public AbstractPlayer(String name, CardDeck cardDeck, UserInterface userInterface) {
@@ -59,5 +59,13 @@ public abstract class AbstractPlayer implements Player {
 
     public UserInterface getUserInterface() {
         return userInterface;
+    }
+
+    public void setCardDeck(CardDeck cardDeck) {
+        this.cardDeck = cardDeck;
+    }
+
+    public void setUserInterface(UserInterface userInterface) {
+        this.userInterface = userInterface;
     }
 }

@@ -1,5 +1,8 @@
 package domain;
 
+import service.CardDeck;
+import service.io.UserInterface;
+
 import java.util.*;
 
 public interface Player {
@@ -17,4 +20,8 @@ public interface Player {
     void showHand();
 
     String getName();
+
+    void setCardDeck(CardDeck cardDeck);
+
+    void setUserInterface(UserInterface userInterface);
 }

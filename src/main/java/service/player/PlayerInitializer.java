@@ -3,6 +3,7 @@ package service.player;
 import domain.Player;
 import domain.PlayerType;
 import exception.PlayerNumberException;
+import service.CardDeck;
 import service.io.UserInterface;
 import validator.PlayerValidator;
 
@@ -19,9 +20,11 @@ import static validator.PlayerValidator.MIN_PLAYERS_MSG;
 public class PlayerInitializer {
 
     private final UserInterface userInterface;
+    private final CardDeck cardDeck;
 
-    public PlayerInitializer(UserInterface userInterface) {
+    public PlayerInitializer(UserInterface userInterface, CardDeck cardDeck) {
         this.userInterface = userInterface;
+        this.cardDeck = cardDeck;
     }
 
     public List<Player> initPlayers() {
@@ -42,6 +45,10 @@ public class PlayerInitializer {
         List<Player> players = new ArrayList<>();
         players.addAll(PlayerCreatorFactory.getPlayerCreator(PlayerType.AI, userInterface).createAll(aiPlayersNum));
         players.addAll(PlayerCreatorFactory.getPlayerCreator(PlayerType.HUMAN, userInterface).createAll(humanPlayersNum));
+        players.forEach(player -> {
+            player.setCardDeck(cardDeck);
+            player.setUserInterface(userInterface);
+        });
         Collections.shuffle(players);
         return players;
     }
