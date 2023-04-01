@@ -18,7 +18,6 @@ import static validator.PlayerValidator.MIN_PLAYERS_MSG;
  */
 public class PlayerInitializer {
 
-    private int totalNumberOfPlayers;
     private final UserInterface userInterface;
 
     public PlayerInitializer(UserInterface userInterface) {
@@ -31,9 +30,9 @@ public class PlayerInitializer {
         boolean isValid = false;
         do {
             try {
-                humanPlayersNum = askNumberOfPlayers(PlayerType.HUMAN);
-                aiPlayersNum = askNumberOfPlayers(PlayerType.AI);
-                validatorMin.validate(totalNumberOfPlayers);
+                humanPlayersNum = getNumberOfPlayers(PlayerType.HUMAN);
+                aiPlayersNum = getNumberOfPlayers(PlayerType.AI);
+                playerValidator.validate(humanPlayersNum + aiPlayersNum);
                 isValid = true;
             } catch (NumberFormatException | PlayerNumberException ex) {
                 userInterface.out(String.format("Wrong number value: %s", ex));
@@ -47,22 +46,18 @@ public class PlayerInitializer {
         return players;
     }
 
-    private int askNumberOfPlayers(PlayerType playerType) throws NumberFormatException, PlayerNumberException{
+    private int getNumberOfPlayers(PlayerType playerType) throws NumberFormatException, PlayerNumberException {
         userInterface.out(String.format("Please enter the number of %s players. (0-6):", playerType));
         userInterface.out("Total number of players should be between 2 and 6:");
-        int num = Integer.parseInt(userInterface.in());
-        validatorMax.validate(num);
-        totalNumberOfPlayers += num;
-        return num;
+        return Integer.parseInt(userInterface.in());
     }
 
-    private final PlayerValidator validatorMax = (num) -> {
-        if(num > (PlayerValidator.MAX - totalNumberOfPlayers))
+    private final PlayerValidator playerValidator = (num) -> {
+        if(num > (PlayerValidator.MAX_PLAYERS)) {
             throw new PlayerNumberException(MAX_PLAYERS_MSG);
-    };
-
-    private final PlayerValidator validatorMin = (num) -> {
-        if(num < (PlayerValidator.MIN - totalNumberOfPlayers))
+        }
+        if(num < (PlayerValidator.MIN_PLAYERS)) {
             throw new PlayerNumberException(MIN_PLAYERS_MSG);
+        }
     };
 }

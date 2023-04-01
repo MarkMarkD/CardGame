@@ -7,7 +7,7 @@ import service.player.PlayerInitializer;
 
 import java.util.List;
 
-/*
+/**
     Just a small card game. Have fun
  */
 public class Main {
