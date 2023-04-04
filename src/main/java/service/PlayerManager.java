@@ -1,9 +1,13 @@
 package service;
 
-import domain.*;
+import domain.Card;
+import domain.Player;
+import domain.Result;
+import domain.ResultType;
 import service.io.UserInterface;
 
-import java.util.*;
+import java.util.Iterator;
+import java.util.List;
 
 public class PlayerManager {
 
@@ -22,44 +26,34 @@ public class PlayerManager {
     }
 
     private void startGame() {
-//        Optional<Card> actionCard = Optional.empty();
-        Result result = null;
+        Result result;
         Iterator<Player> iterator = players.iterator();
         Player currentPlayer;
-        while(players.size() >= 1) {
+        Card placedCard = null;
+        while(players.size() > 1) {
             if(!iterator.hasNext()) {
                 iterator = players.iterator();
             }
             currentPlayer = iterator.next();
-            userInterface.out("");
-            userInterface.out("Player " + currentPlayer.getName() + " makes a move: ");
-            // first turn in game
-            if (result == null) {
-                result = currentPlayer.attack();
+            if (placedCard != null) {
+                result = currentPlayer.processCard(placedCard);
+                if (result.getResultType().equals(ResultType.TOOK_PLACED_CARD)) {
+                    placedCard = null;
+                    continue;   // take card and skip move
+                }
                 currentPlayer.fillHand();
             }
-            else {
-                if(ResultType.ATTACKED.equals(result.getResultType())) {
-                    result = currentPlayer.defend(result.getActionCard());
-                    currentPlayer.fillHand();
-                    if (currentPlayer.getHand().isEmpty()) {
-                        iterator.remove();
-                        continue;
-                    }
-                }
-                if(ResultType.DEFENDED.equals(result.getResultType())) {
-                    result = currentPlayer.attack();
-                    currentPlayer.fillHand();
-                    if (currentPlayer.getHand().isEmpty()) {
-                        iterator.remove();
-                        continue;
-                    }
-                }
+            if (currentPlayer.getHand().isEmpty()) {
+                iterator.remove();
+                continue;
             }
-
-            if (players.size() == 1 && (result.getResultType().equals(ResultType.DEFENDED)
-                    || (result.getResultType().equals(ResultType.TOOK_PLACED_CARD)))) {
+            if (players.size() == 1) {
                 break;
+            }
+            placedCard =  currentPlayer.makeMove();
+            currentPlayer.fillHand();
+            if (currentPlayer.getHand().isEmpty()) {
+                iterator.remove();
             }
         }
     }
@@ -69,5 +63,4 @@ public class PlayerManager {
         userInterface.out("Game results: ");
         userInterface.out(players.size() == 1 ? players.get(0).getName() + " lost the game" : "Dead heat");
     }
-
 }

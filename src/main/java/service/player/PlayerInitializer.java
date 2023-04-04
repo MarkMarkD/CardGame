@@ -5,14 +5,14 @@ import domain.PlayerType;
 import exception.PlayerNumberException;
 import service.CardDeck;
 import service.io.UserInterface;
-import validator.PlayerValidator;
+import validator.PlayerNumberValidator;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static validator.PlayerValidator.MAX_PLAYERS_MSG;
-import static validator.PlayerValidator.MIN_PLAYERS_MSG;
+import static validator.PlayerNumberValidator.MAX_PLAYERS_MSG;
+import static validator.PlayerNumberValidator.MIN_PLAYERS_MSG;
 
 /**
  * The class is intended to provide a list of initialized players
@@ -35,7 +35,7 @@ public class PlayerInitializer {
             try {
                 humanPlayersNum = getNumberOfPlayers(PlayerType.HUMAN);
                 aiPlayersNum = getNumberOfPlayers(PlayerType.AI);
-                playerValidator.validate(humanPlayersNum + aiPlayersNum);
+                playerNumberValidator.validate(humanPlayersNum + aiPlayersNum);
                 isValid = true;
             } catch (NumberFormatException | PlayerNumberException ex) {
                 userInterface.out(String.format("Wrong number value: %s", ex));
@@ -59,11 +59,11 @@ public class PlayerInitializer {
         return Integer.parseInt(userInterface.in());
     }
 
-    private final PlayerValidator playerValidator = (num) -> {
-        if(num > (PlayerValidator.MAX_PLAYERS)) {
+    private final PlayerNumberValidator playerNumberValidator = (num) -> {
+        if(num > (PlayerNumberValidator.MAX_PLAYERS)) {
             throw new PlayerNumberException(MAX_PLAYERS_MSG);
         }
-        if(num < (PlayerValidator.MIN_PLAYERS)) {
+        if(num < (PlayerNumberValidator.MIN_PLAYERS)) {
             throw new PlayerNumberException(MIN_PLAYERS_MSG);
         }
     };

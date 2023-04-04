@@ -1,18 +1,12 @@
 package validator;
 
-import exception.PlayerNumberException;
+@FunctionalInterface
+public interface PlayerNumberValidator extends Validator<Integer>{
 
-//todo delete class
-public class PlayerNumberValidator implements PlayerValidator {
+    int MIN_PLAYERS = 2;
+    int MAX_PLAYERS = 6;
+    String MIN_PLAYERS_MSG = String.format("Number of players can't be less than %s", MIN_PLAYERS);
+    String MAX_PLAYERS_MSG = String.format("Number of players can't exceed %s", MAX_PLAYERS);
 
-    @Override
-    public void validate(int players) {
-        if (players < 2) {
-            throw new PlayerNumberException(MIN_PLAYERS_MSG);
-        }
-
-        if (players > 6) {
-            throw new PlayerNumberException(MAX_PLAYERS_MSG);
-        }
-    }
+    void validate(Integer players);
 }

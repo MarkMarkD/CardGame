@@ -9,7 +9,7 @@ public class Result {
     }
 
     public Result(ResultType resultType, Card actionCard) {
-        this.resultType = resultType;
+        this(resultType);
         this.actionCard = actionCard;
     }
 

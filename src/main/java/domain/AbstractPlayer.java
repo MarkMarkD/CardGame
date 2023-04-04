@@ -53,7 +53,25 @@ public abstract class AbstractPlayer implements Player {
         return name;
     }
 
-    public CardDeck getDeckHolder() {
+    @Override
+    public Card makeMove() {
+        userInterface.out("");
+        userInterface.out("Player " + getName() + " makes a move: ");
+        return getCardForMove();
+    }
+
+    @Override
+    public Result processCard(Card placedCard) {
+        userInterface.out("");
+        userInterface.out("Player " + getName() + " is going to beat the card: " + placedCard);
+        return tryToBeatCard(placedCard);
+    }
+
+    protected abstract Result tryToBeatCard(Card placedCard);
+
+    protected abstract Card getCardForMove();
+
+    public CardDeck getCardDeck() {
         return cardDeck;
     }
 
@@ -67,5 +85,12 @@ public abstract class AbstractPlayer implements Player {
 
     public void setUserInterface(UserInterface userInterface) {
         this.userInterface = userInterface;
+    }
+
+    public List<Card> getCardsThatCanBeatPlacedCard(Card placedCard) {
+        return cardsInHand.stream()
+                .filter(card -> card.getSuit().equals(placedCard.getSuit())
+                        || card.getSuit().equals(getCardDeck().getTrumpSuit()))
+                .filter(card -> card.getRank().getNumber() > placedCard.getRank().getNumber()).toList();
     }
 }

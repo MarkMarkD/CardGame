@@ -11,9 +11,9 @@ public interface Player {
 
     void takeCard(Card placedCard);
 
-    Result attack();
+    Card makeMove();
 
-    Result defend(Card actionCard);
+    Result processCard(Card card);
 
     List<Card> getHand();
 
