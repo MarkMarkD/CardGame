@@ -47,10 +47,6 @@ public class PlayerInitializer {
                 .createAll(aiPlayersNum));
         players.addAll(PlayerCreatorFactory.getPlayerCreator(PlayerType.HUMAN, cardDeck, userInterface)
                 .createAll(humanPlayersNum));
-        players.forEach(player -> {
-            player.setCardDeck(cardDeck);
-            player.setUserInterface(userInterface);
-        });
         Collections.shuffle(players);
         return players;
     }
