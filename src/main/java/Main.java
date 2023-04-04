@@ -22,7 +22,7 @@ public class Main {
 
     public static void printGreetings(UserInterface userInterface) {
         userInterface.out("Greetings!");
-        userInterface.out("Today you gonna challenge against the computer or other players in this awesome card game");
-        userInterface.out("Total number of players has to be 2-6");
+        userInterface.out("Today you gonna challenge against the computer or other players in this awesome card game.");
+        userInterface.out("Total number of players should be between 2 and 6.");
     }
 }

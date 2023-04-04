@@ -28,7 +28,7 @@ public class HumanPlayer extends AbstractPlayer {
                 return new Result(ResultType.DEFENDED, defendCard.get());
             } catch (CardValidationException ex) {
                 getUserInterface().out(ex.getMessage());
-                getUserInterface().out("Please select another card or type \"take\" to take the card: ");
+                getUserInterface().out("Please select another card.");
             }
         }
     }
@@ -42,7 +42,7 @@ public class HumanPlayer extends AbstractPlayer {
 
     private void validateSelected(Card selectedCard, Card placedCard) {
         if (!getCardsThatCanBeatPlacedCard(placedCard).contains(selectedCard)) {
-            throw new CardValidationException("Selected card cannot beat placed card. ");
+            throw new CardValidationException();
         }
     }
 

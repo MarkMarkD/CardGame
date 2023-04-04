@@ -6,6 +6,8 @@ import service.io.UserInterface;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.BiFunction;
+import java.util.function.Predicate;
 
 public abstract class AbstractPlayer implements Player {
 
@@ -31,7 +33,7 @@ public abstract class AbstractPlayer implements Player {
 
     @Override
     public void takeCard(Card placedCard) {
-        userInterface.out("taking the card " + placedCard);
+        userInterface.out("Player " + getName() + " is taking the card " + placedCard);
         cardsInHand.add(placedCard);
     }
 
@@ -56,15 +58,22 @@ public abstract class AbstractPlayer implements Player {
     @Override
     public Card makeMove() {
         userInterface.out("");
-        userInterface.out("Player " + getName() + " makes a move: ");
-        return getCardForMove();
+        userInterface.out(String.format("Player %s makes a move: ", getName()));
+        userInterface.out(String.format("Trump card is %s ", getCardDeck().getTrumpSuit()));
+        Card placedCard = getCardForMove();
+        userInterface.out(String.format("Placed card: %s", placedCard));
+        return placedCard;
     }
 
     @Override
     public Result processCard(Card placedCard) {
         userInterface.out("");
         userInterface.out("Player " + getName() + " is going to beat the card: " + placedCard);
-        return tryToBeatCard(placedCard);
+        Result result = tryToBeatCard(placedCard);
+        if (result.getResultType().equals(ResultType.DEFENDED)) {
+            userInterface.out(("Player " + getName() + " successfully beats placed card"));
+        }
+        return result;
     }
 
     protected abstract Result tryToBeatCard(Card placedCard);
@@ -89,8 +98,23 @@ public abstract class AbstractPlayer implements Player {
 
     public List<Card> getCardsThatCanBeatPlacedCard(Card placedCard) {
         return cardsInHand.stream()
-                .filter(card -> card.getSuit().equals(placedCard.getSuit())
-                        || card.getSuit().equals(getCardDeck().getTrumpSuit()))
-                .filter(card -> card.getRank().getNumber() > placedCard.getRank().getNumber()).toList();
+                .filter((
+                        ofTheSameSuit(placedCard).and(hasHigherRank(placedCard)))
+                        .or((placedCardIsNotTrump(placedCard)).and(cardInHandIsTrump)))
+                .toList();
+    }
+
+    private final Predicate<Card> cardInHandIsTrump = (card) -> card.getSuit().equals(getCardDeck().getTrumpSuit());
+
+    private Predicate<Card> ofTheSameSuit(Card placedCard) {
+        return card -> card.getSuit().equals(placedCard.getSuit());
+    }
+
+    private Predicate<Card> hasHigherRank(Card placedCard) {
+        return card -> card.getRank().getNumber() > placedCard.getRank().getNumber();
+    }
+
+    private Predicate<Card> placedCardIsNotTrump(Card placedCard) {
+        return card -> !placedCard.getSuit().equals(getCardDeck().getTrumpSuit());
     }
 }

@@ -19,6 +19,7 @@ public class AiPlayer extends AbstractPlayer {
         Optional<Card> defendCard = chooseCardToBeatPlacedCard(placedCard);
         if (defendCard.isPresent()) {
             cardsInHand.remove(defendCard.get());
+            getUserInterface().out(getName() + " selected card " + defendCard.get());
             return new Result(ResultType.DEFENDED);
         }
         takeCard(placedCard);

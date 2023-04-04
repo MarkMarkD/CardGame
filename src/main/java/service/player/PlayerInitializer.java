@@ -57,7 +57,6 @@ public class PlayerInitializer {
 
     private int getNumberOfPlayers(PlayerType playerType) throws NumberFormatException, PlayerNumberException {
         userInterface.out(String.format("Please enter the number of %s players. (0-6):", playerType));
-        userInterface.out("Total number of players should be between 2 and 6:");
         return Integer.parseInt(userInterface.in());
     }
 

@@ -7,4 +7,8 @@ public class CardValidationException extends RuntimeException {
     public CardValidationException(String message) {
         super(MSG + message);
     }
+
+    public CardValidationException() {
+        super(MSG);
+    }
 }
