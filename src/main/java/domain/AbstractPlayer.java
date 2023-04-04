@@ -87,14 +87,6 @@ public abstract class AbstractPlayer implements Player {
         return userInterface;
     }
 
-    public void setCardDeck(CardDeck cardDeck) {
-        this.cardDeck = cardDeck;
-    }
-
-    public void setUserInterface(UserInterface userInterface) {
-        this.userInterface = userInterface;
-    }
-
     public List<Card> getCardsThatCanBeatPlacedCard(Card placedCard) {
         return cardsInHand.stream()
                 .filter((
