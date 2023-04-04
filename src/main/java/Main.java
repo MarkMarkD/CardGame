@@ -1,38 +1,28 @@
-import domain.AbstractPlayer;
-import domain.Card;
 import domain.Player;
-import service.DeckService;
-import service.PlayerCreator;
+import service.CardDeck;
 import service.PlayerManager;
-import service.PlayerService;
+import service.io.ConsoleUserInterface;
+import service.io.UserInterface;
+import service.player.PlayerInitializer;
 
-import java.util.*;
+import java.util.List;
 
-/*
-    In this small project I used Java core technologies and OOP concepts like encapsulation, abstraction, inheritance,
-    polymorphism, Java 8 streams and lambdas, a little bit of collections and exception handling
+/**
+    Just a small card game. Have fun
  */
-
 public class Main {
+
     public static void main(String[] args) {
+        UserInterface userInterface = new ConsoleUserInterface();
+        printGreetings(userInterface);
+        CardDeck cardDeck = new CardDeck();
+        List<Player> players = new PlayerInitializer(userInterface, cardDeck).initPlayers();
+        new PlayerManager(players, userInterface).play();
+    }
 
-        System.out.println("Greetings!");
-        System.out.println("Today you gonna challenge against the computer in this awesome card game");
-        System.out.println("Total number of players must be 2-6");
-
-        Queue<Card> cardDeck = new DeckService().createNewDeck();
-        PlayerService playerService = new PlayerService(cardDeck.peek());
-        PlayerCreator playerCreator = new PlayerCreator(cardDeck, playerService);
-
-        List<Player> players = playerCreator.createPlayers();
-
-        if (players.size() < 2 || players.size() > 6) {
-            System.out.println("Error. Number of players must be 2 to 6");
-            System.exit(0);
-        }
-
-        PlayerManager manager = new PlayerManager(players, cardDeck);
-        manager.play();
-
+    public static void printGreetings(UserInterface userInterface) {
+        userInterface.out("Greetings!");
+        userInterface.out("Today you gonna challenge against the computer or other players in this awesome card game.");
+        userInterface.out("Total number of players should be between 2 and 6.");
     }
 }

@@ -1,49 +1,53 @@
 package domain;
 
-import service.PlayerService;
+import service.CardDeck;
+import service.io.UserInterface;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Queue;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.BiFunction;
+import java.util.function.Predicate;
 
 public abstract class AbstractPlayer implements Player {
 
-    private final Queue<Card> cardDeck;
-    protected PlayerService playerService;
-    protected String name;                              // player's name
-    protected List<Card> hand = new ArrayList<>();      // cards in player's hand
-    protected boolean isSuccessfullyDefended;           // flag to define if player was defending or attacking
-    private int i;                                      // counter for showing hand
+    private final String name;
+    private CardDeck cardDeck;
+    private UserInterface userInterface;
+    protected List<Card> cardsInHand = new ArrayList<>();
 
-    public AbstractPlayer(Queue<Card> cardDeck, PlayerService playerService) {
+    public AbstractPlayer(String name, CardDeck cardDeck, UserInterface userInterface) {
+        this.name = name;
         this.cardDeck = cardDeck;
-        this.playerService = playerService;
+        this.userInterface = userInterface;
     }
 
     @Override
     public void fillHand() {
-        while(hand.size() < 6) {
+        while(cardsInHand.size() < 6) {
             if (cardDeck.isEmpty())
                 return;
-            hand.add(cardDeck.poll());
+            cardsInHand.add(cardDeck.getNextCardFromDeck());
         }
     }
 
     @Override
     public void takeCard(Card placedCard) {
-        System.out.println("taking the card " + placedCard);
-        hand.add(placedCard);
+        userInterface.out("Player " + getName() + " is taking the card " + placedCard);
+        cardsInHand.add(placedCard);
     }
 
     @Override
     public void showHand() {
-        i = 0;
-        hand.stream().map(card -> ++i + ": " + card.toString()).forEach(System.out::println);
+        AtomicInteger counter = new AtomicInteger();
+        cardsInHand.stream()
+                .map(card -> counter.incrementAndGet() + ": " + card.toString())
+                .forEach(System.out::println);
     }
 
     @Override
     public List<Card> getHand() {
-        return hand;
+        return cardsInHand;
     }
 
     @Override
@@ -51,22 +55,66 @@ public abstract class AbstractPlayer implements Player {
         return name;
     }
 
-    public AbstractPlayer name(String name) {
-        this.name = name;
-        return this;
+    @Override
+    public Card makeMove() {
+        userInterface.out("");
+        userInterface.out(String.format("Player %s makes a move: ", getName()));
+        userInterface.out(String.format("Trump card is %s ", getCardDeck().getTrumpSuit()));
+        Card placedCard = getCardForMove();
+        userInterface.out(String.format("Placed card: %s", placedCard));
+        return placedCard;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    @Override
+    public Result processCard(Card placedCard) {
+        userInterface.out("");
+        userInterface.out("Player " + getName() + " is going to beat the card: " + placedCard);
+        Result result = tryToBeatCard(placedCard);
+        if (result.getResultType().equals(ResultType.DEFENDED)) {
+            userInterface.out(("Player " + getName() + " successfully beats placed card"));
+        }
+        return result;
     }
 
-    public boolean isSuccessfullyDefended() {
-        return isSuccessfullyDefended;
+    protected abstract Result tryToBeatCard(Card placedCard);
+
+    protected abstract Card getCardForMove();
+
+    public CardDeck getCardDeck() {
+        return cardDeck;
     }
 
-    public void setSuccessfullyDefended(boolean successfullyDefended) {
-        isSuccessfullyDefended = successfullyDefended;
+    public UserInterface getUserInterface() {
+        return userInterface;
     }
 
+    public void setCardDeck(CardDeck cardDeck) {
+        this.cardDeck = cardDeck;
+    }
 
+    public void setUserInterface(UserInterface userInterface) {
+        this.userInterface = userInterface;
+    }
+
+    public List<Card> getCardsThatCanBeatPlacedCard(Card placedCard) {
+        return cardsInHand.stream()
+                .filter((
+                        ofTheSameSuit(placedCard).and(hasHigherRank(placedCard)))
+                        .or((placedCardIsNotTrump(placedCard)).and(cardInHandIsTrump)))
+                .toList();
+    }
+
+    private final Predicate<Card> cardInHandIsTrump = (card) -> card.getSuit().equals(getCardDeck().getTrumpSuit());
+
+    private Predicate<Card> ofTheSameSuit(Card placedCard) {
+        return card -> card.getSuit().equals(placedCard.getSuit());
+    }
+
+    private Predicate<Card> hasHigherRank(Card placedCard) {
+        return card -> card.getRank().getNumber() > placedCard.getRank().getNumber();
+    }
+
+    private Predicate<Card> placedCardIsNotTrump(Card placedCard) {
+        return card -> !placedCard.getSuit().equals(getCardDeck().getTrumpSuit());
+    }
 }

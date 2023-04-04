@@ -1,35 +1,58 @@
 package domain;
 
-import service.PlayerService;
+import service.CardDeck;
+import service.io.UserInterface;
 
-import java.util.Queue;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
 
 
 public class AiPlayer extends AbstractPlayer {
 
-    public AiPlayer(Queue<Card> cardDeck, PlayerService playerService) {
-        super(cardDeck, playerService);
+    public AiPlayer(String name, CardDeck cardDeck, UserInterface ui) {
+        super(name, cardDeck, ui);
     }
 
     @Override
-    public Card move(Card placedCard) {
-        System.out.println("trump : " + playerService.getTrump().getSuit());
-        System.out.println("placedCard = " + (placedCard == null ? "no card" : placedCard.toString()));
-
-        Card cardForMove = playerService.getCardForMove(placedCard, hand);
-        System.out.println("card for move = " + (cardForMove == null ? "no card" : cardForMove.toString()));
-
-        if (cardForMove == null) {
-            takeCard(placedCard);
-            setSuccessfullyDefended(false);
-            return null;
+    protected Result tryToBeatCard(Card placedCard) {
+        Optional<Card> defendCard = chooseCardToBeatPlacedCard(placedCard);
+        if (defendCard.isPresent()) {
+            cardsInHand.remove(defendCard.get());
+            getUserInterface().out(getName() + " selected card " + defendCard.get());
+            return new Result(ResultType.DEFENDED);
         }
-        fillHand();
-        if (placedCard != null) {
-            setSuccessfullyDefended(true);
-            return null;
-        }
-        return cardForMove;
+        takeCard(placedCard);
+        return new Result(ResultType.TOOK_PLACED_CARD);
+
     }
 
+    @Override
+    protected Card getCardForMove() {
+        Card card = getSmallestNonTrump(cardsInHand).or(() -> getSmallestTrump(cardsInHand))
+                .orElseThrow(() -> new RuntimeException("Couldn't choose card for move from hand"));
+        cardsInHand.remove(card);
+        return card;
+    }
+
+    private Optional<Card> getSmallestTrump(List<Card> hand) {
+        return hand.stream()
+                .filter(card -> card.getSuit().equals(getCardDeck().getTrumpSuit()))
+                .min(Comparator.comparingInt(o -> o.getRank().getNumber()));
+    }
+
+    private Optional<Card> getSmallestNonTrump(List<Card> hand) {
+        return hand.stream()
+                .filter(card -> !card.getSuit().equals(getCardDeck().getTrumpSuit()))
+                .min(Comparator.comparingInt(o -> o.getRank().getNumber()));
+    }
+
+    private Optional<Card> chooseCardToBeatPlacedCard(Card placedCard) {
+        List<Card> cardsToBeatPlacedCard = getCardsThatCanBeatPlacedCard(placedCard);
+
+        Optional<Card> cardToBeatPlacedCard = getSmallestNonTrump(cardsToBeatPlacedCard)
+                .or(() -> getSmallestTrump(cardsToBeatPlacedCard));
+        cardToBeatPlacedCard.ifPresent(cardsInHand::remove);
+        return cardToBeatPlacedCard;
+    }
 }

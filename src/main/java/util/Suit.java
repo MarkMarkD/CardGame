@@ -1,12 +1,12 @@
 package util;
 
 public enum Suit {
-    DIAMONDS ("Diamonds"),
-    HEARTS ("Hearts"),
-    CLUBS ("Clubs"),
-    SPADES ("Spades");
+    DIAMONDS ("diamonds"),
+    HEARTS ("hearts"),
+    CLUBS ("clubs"),
+    SPADES ("spades");
 
-    private String title;
+    private final String title;
 
     Suit(String title) {
         this.title = title;

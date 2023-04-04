@@ -1,18 +1,22 @@
 package service;
 
-import domain.*;
+import domain.Card;
+import domain.Player;
+import domain.Result;
+import domain.ResultType;
+import service.io.UserInterface;
 
-import java.util.*;
+import java.util.Iterator;
+import java.util.List;
 
 public class PlayerManager {
 
     private final List<Player> players;
-    private final Queue<Card> deck;
+    private final UserInterface userInterface;
 
-    public PlayerManager(List<Player> players,
-                         Queue<Card> deck) {
+    public PlayerManager(List<Player> players, UserInterface userInterface) {
         this.players = players;
-        this.deck = deck;
+        this.userInterface = userInterface;
     }
 
     public void play() {
@@ -21,50 +25,42 @@ public class PlayerManager {
         showGameResults();
     }
 
-    // start the game
     private void startGame() {
+        Result result;
+        Iterator<Player> iterator = players.iterator();
+        Player currentPlayer;
         Card placedCard = null;
-        Iterator iterator = players.iterator();
-        Player player;
-        while(players.size() >= 1) {
-            if(iterator.hasNext()) {
-                player = (Player) iterator.next();
-                System.out.println();
-                System.out.println("player " + (player).getName() + " makes a move: ");
-                placedCard = player.move(placedCard);
-
-                if (((AbstractPlayer) player).isSuccessfullyDefended()){
-                    placedCard = null;
-                    if (player.getHand().size() > 0) {
-                        ((AbstractPlayer) player).setSuccessfullyDefended(false);
-                        placedCard = player.move(placedCard);
-                    }
-                }
-
-                if (player.getHand().size() == 0)
-                    iterator.remove();
-                if (players.size() == 1 && placedCard == null)
-                    break;
-            } else
+        while(players.size() > 1) {
+            if(!iterator.hasNext()) {
                 iterator = players.iterator();
+            }
+            currentPlayer = iterator.next();
+            if (placedCard != null) {
+                result = currentPlayer.processCard(placedCard);
+                if (result.getResultType().equals(ResultType.TOOK_PLACED_CARD)) {
+                    placedCard = null;
+                    continue;   // take card and skip move
+                }
+                currentPlayer.fillHand();
+            }
+            if (currentPlayer.getHand().isEmpty()) {
+                iterator.remove();
+                continue;
+            }
+            if (players.size() == 1) {
+                break;
+            }
+            placedCard =  currentPlayer.makeMove();
+            currentPlayer.fillHand();
+            if (currentPlayer.getHand().isEmpty()) {
+                iterator.remove();
+            }
         }
     }
 
     private void showGameResults() {
-        System.out.println();
-        System.out.println("Game results: ");
-        System.out.println(players.size() == 1 ? players.get(0).getName() + " lost the game" : "Dead heat");
-        System.out.println(deck.size());
+        userInterface.out("");
+        userInterface.out("Game results: ");
+        userInterface.out(players.size() == 1 ? players.get(0).getName() + " lost the game" : "Dead heat");
     }
-
-    public Card getCardFromDeck() {
-        Card cardFromDeck = null;
-        Iterator iterator = deck.iterator();
-        if (iterator.hasNext()) {
-            cardFromDeck = (Card) iterator.next();
-            iterator.remove();
-        }
-        return cardFromDeck;
-    }
-
 }
