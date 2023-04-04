@@ -10,8 +10,8 @@ public class PlayerCreatorFactory {
 
     public static PlayerCreator getPlayerCreator(PlayerType type, CardDeck cardDeck, UserInterface userInterface) {
         return switch (type) {
-            case AI -> new AiPlayerCreator(new RandomNameGenerator());
-            case HUMAN -> new HumanPlayerCreator(new UserBasedNameProvider(userInterface));
+            case AI -> new AiPlayerCreator(new RandomNameGenerator(), cardDeck, userInterface);
+            case HUMAN -> new HumanPlayerCreator(new UserBasedNameProvider(userInterface), cardDeck, userInterface);
         };
     }
 }

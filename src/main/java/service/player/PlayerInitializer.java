@@ -43,8 +43,10 @@ public class PlayerInitializer {
         } while (!isValid);
 
         List<Player> players = new ArrayList<>();
-        players.addAll(PlayerCreatorFactory.getPlayerCreator(PlayerType.AI, userInterface).createAll(aiPlayersNum));
-        players.addAll(PlayerCreatorFactory.getPlayerCreator(PlayerType.HUMAN, userInterface).createAll(humanPlayersNum));
+        players.addAll(PlayerCreatorFactory.getPlayerCreator(PlayerType.AI, cardDeck, userInterface)
+                .createAll(aiPlayersNum));
+        players.addAll(PlayerCreatorFactory.getPlayerCreator(PlayerType.HUMAN, cardDeck, userInterface)
+                .createAll(humanPlayersNum));
         players.forEach(player -> {
             player.setCardDeck(cardDeck);
             player.setUserInterface(userInterface);
